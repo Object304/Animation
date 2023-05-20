@@ -104,6 +104,10 @@ namespace Graphic {
 		const char* curName = "Data\\pic1.txt";
 		int curNum = 0;
 
+		void WorkSpace() {
+			drawKnight1();
+		}
+
 		void updateName() {
 			String^ str = gcnew String(curName);
 			str = str->Substring(0, 8);
@@ -143,6 +147,37 @@ namespace Graphic {
 			pbPlot->Refresh();
 		}
 
+		void drawKnight1() {
+			String^ fileName = "Knight1\\pic1.txt";
+			for (int i = 1; i < 47; i++) {
+				fileName = fileName->Substring(0, 11);
+				fileName += i + ".txt";
+
+				char* fName = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(fileName);
+
+				std::ifstream in(fName);
+				if (!in) {
+					in.close();
+					continue;
+				}
+				in.close();
+
+				array<PointF>^ points = gcnew array<PointF>(getSize(fName));
+				if (points->Length < 2)
+					return;
+				PointF point;
+				FILE* fLog = fopen(fName, "r");
+				int x, y;
+				for (int i = 0; fscanf(fLog, "%d\t%d\n", &x, &y) != EOF; i++) {
+					point.X = x;
+					point.Y = y;
+					points[i] = point;
+				}
+				fclose(fLog);
+				gr->DrawLines(pn_line, points);
+			}
+		}
+
 private: System::Void MyForm_KeyPress(System::Object^ sender, System::Windows::Forms::KeyPressEventArgs^ e) {
 	if (Convert::ToInt16(e->KeyChar) == Convert::ToInt16(System::Windows::Forms::Keys::C))
 		Clear();
@@ -152,7 +187,10 @@ private: System::Void MyForm_KeyPress(System::Object^ sender, System::Windows::F
 		curNum = 0;
 		Clear();
 		pbPlot->Refresh();
-	}		
+	}
+	if (Convert::ToInt16(e->KeyChar) == Convert::ToInt16(System::Windows::Forms::Keys::Enter)) {
+		WorkSpace();
+	}
 }
 private: System::Void pbPlot_MouseMove(System::Object^ sender, System::Windows::Forms::MouseEventArgs^ e) {
 	if (mouseClick == false)
