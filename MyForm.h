@@ -187,13 +187,13 @@ namespace Graphic {
 		}
 
 		void GO() {
-			/*drawSky();
+			drawSky();
 			drawCastle();
 			drawGround();
-			drawKnight1();*/
+			drawKnight1();
 			//drawInside1();
-			drawInside2();
-			drawKnight2();
+			//drawInside2();
+			//drawKnight2();
 			
 
 			pbPlot->Refresh();
