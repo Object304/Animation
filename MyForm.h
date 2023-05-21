@@ -33,7 +33,6 @@ namespace Graphic {
 			pn_line = gcnew Pen(Color::Black, 3);
 			pn_grid = gcnew Pen(Color::Gray, 1);
 			printFont = gcnew System::Drawing::Font("Arial", 8);
-			br_Metal = gcnew SolidBrush(Color::Gray);
 			gr = Graphics::FromImage(pbPlot->Image);
 		}
 
@@ -107,12 +106,12 @@ namespace Graphic {
 		}
 #pragma endregion
 
-		Brush^ br, ^ br_text, ^ br_Metal;
+		Brush^ br, ^ br_text;
 		Pen^ pn_axes, ^ pn_line, ^ pn_grid;
 		System::Drawing::Font^ printFont;
 		Graphics^ gr;
 		bool mouseClick = false;
-		const char* curName = "Data\\pic1.txt";
+		const char* curName = "Data\\picf1.txt";
 		int curNum = 1;
 
 		void WorkSpace() {
@@ -121,7 +120,7 @@ namespace Graphic {
 
 		void updateName() {
 			String^ str = gcnew String(curName);
-			str = str->Substring(0, 8);
+			str = str->Substring(0, 9);
 			curNum++;
 			curName = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(str + curNum + ".txt");
 		}
@@ -187,10 +186,12 @@ namespace Graphic {
 			pbPlot->Refresh();
 		}
 
-		void drawKnight1() {
-			String^ fileName = "Knight1\\pic1.txt";
+		void drawGround() {
+			String^ fileName = "Ground\\pic1.txt";
 			char* fName = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(fileName);
-			array<PointF>^ points = gcnew array<PointF>(getSize(fName));
+			array<PointF>^ points = gcnew array<PointF>(getSize(fName) + 2);
+			if (points->Length < 2)
+				return;
 			PointF point;
 			FILE* fLog = fopen(fName, "r");
 			int x, y;
@@ -199,8 +200,63 @@ namespace Graphic {
 				point.Y = y;
 				points[i] = point;
 			}
+			point.X = pbPlot->Image->Width;
+			point.Y = pbPlot->Image->Width;
+			points[17] = point;
+			point.X = 0;
+			point.Y = pbPlot->Image->Height;
+			points[18] = point;
 			fclose(fLog);
-			gr->FillPolygon(br_Metal, points);
+			Brush^ br1 = gcnew SolidBrush(Color::Green);
+			gr->FillPolygon(br1, points);
+			
+		}
+
+		void drawSky() {
+			Brush^ br1 = gcnew SolidBrush(Color::DarkOrange);
+			gr->FillRectangle(br1, 0, 0, pbPlot->Image->Width, pbPlot->Image->Height);
+		}
+
+		void drawKnight1() {
+
+			//fills
+
+			{
+				String^ fileName = "Knight1\\picf1.txt";
+				Brush^ br1;
+				for (int i = 1; i < 6; i++) {
+					if (i == 1)
+						br1 = gcnew SolidBrush(Color::Gray);
+					if (i == 2)
+						br1 = gcnew SolidBrush(Color::DarkGray);
+					if (i == 3)
+						br1 = gcnew SolidBrush(Color::Orange);
+					if (i == 5 || i == 4)
+						br1 = gcnew SolidBrush(Color::Gray);
+					/*if (i == 6)
+						br1 = gcnew SolidBrush(Color::Gray);*/
+					fileName = fileName->Substring(0, 12);
+					fileName += i + ".txt";
+					char* fName = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(fileName);
+					array<PointF>^ points = gcnew array<PointF>(getSize(fName));
+					if (points->Length < 2)
+						return;
+					PointF point;
+					FILE* fLog = fopen(fName, "r");
+					int x, y;
+					for (int i = 0; fscanf(fLog, "%d\t%d\n", &x, &y) != EOF; i++) {
+						point.X = x;
+						point.Y = y;
+						points[i] = point;
+					}
+					fclose(fLog);
+					gr->FillPolygon(br1, points);
+				}
+			}
+
+			//contours
+
+			String^ fileName = "Knight1\\pic1.txt";
 			for (int i = 1; i < 77; i++) {
 				fileName = fileName->Substring(0, 11);
 				fileName += i + ".txt";
@@ -222,6 +278,36 @@ namespace Graphic {
 		}
 
 		void drawCastle() {
+
+			{
+				String^ fileName = "Castle\\picf1.txt";
+				Brush^ br1;
+				for (int i = 1; i < 24; i++) {
+					if (i == 1)
+						br1 = gcnew SolidBrush(Color::DarkGreen);
+					if (i == 2)
+						br1 = gcnew SolidBrush(Color::Gray);
+					if (i == 3)
+						br1 = gcnew SolidBrush(Color::Orange);
+					fileName = fileName->Substring(0, 11);
+					fileName += i + ".txt";
+					char* fName = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(fileName);
+					array<PointF>^ points = gcnew array<PointF>(getSize(fName));
+					if (points->Length < 2)
+						return;
+					PointF point;
+					FILE* fLog = fopen(fName, "r");
+					int x, y;
+					for (int i = 0; fscanf(fLog, "%d\t%d\n", &x, &y) != EOF; i++) {
+						point.X = x;
+						point.Y = y;
+						points[i] = point;
+					}
+					fclose(fLog);
+					gr->FillPolygon(br1, points);
+				}
+			}
+
 			String^ fileName = "Castle\\pic1.txt";
 			for (int i = 1; i < 78; i++) {
 				fileName = fileName->Substring(0, 10);
@@ -244,7 +330,9 @@ namespace Graphic {
 		}
 
 		void GO() {
+			drawSky();
 			drawCastle();
+			drawGround();
 			drawKnight1();
 			pbPlot->Refresh();
 		}
