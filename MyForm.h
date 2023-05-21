@@ -111,7 +111,7 @@ namespace Graphic {
 		System::Drawing::Font^ printFont;
 		Graphics^ gr;
 		bool mouseClick = false;
-		const char* curName = "Data\\pic1.txt";
+		const char* curName = "Data\\picf1.txt";
 		int curNum = 1;
 
 		void WorkSpace() {
@@ -120,7 +120,7 @@ namespace Graphic {
 
 		void updateName() {
 			String^ str = gcnew String(curName);
-			str = str->Substring(0, 8);
+			str = str->Substring(0, 9);
 			curNum++;
 			curName = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(str + curNum + ".txt");
 		}
@@ -187,15 +187,16 @@ namespace Graphic {
 		}
 
 		void GO() {
-			drawSky();
+			/*drawSky();
 			drawCastle();
 			drawGround();
 			drawKnight1();
-			//drawInside1();
-			//drawInside2();
-			//drawKnight2();
-			
-
+			drawInside1();
+			drawInside2();
+			drawKnight2();
+			*/
+			//drawInside3();
+			drawSkeleton2();
 			pbPlot->Refresh();
 		}
 
@@ -515,6 +516,167 @@ namespace Graphic {
 				gr->DrawLines(pn_line, points);
 			}
 		}
+
+		//Scenes 4, 5
+
+		void drawInside3() {
+			drawInside1();
+			Brush^ br1 = gcnew SolidBrush(Color::DarkGray);
+			gr->FillRectangle(br1, 0, 245, pbPlot->Image->Width, pbPlot->Image->Height);
+		}
+
+		void drawSkeleton1() {
+			//fills
+
+			{
+				String^ fileName = "Skeleton1\\picf1.txt";
+				Brush^ br1;
+				for (int i = 1; i < 6; i++) {
+					if (i == 1)
+						br1 = gcnew SolidBrush(Color::White);
+					if (i == 4)
+						br1 = gcnew SolidBrush(Color::DarkSlateGray);
+					if (i == 5)
+						br1 = gcnew SolidBrush(Color::Brown);
+					fileName = fileName->Substring(0, 14);
+					fileName += i + ".txt";
+					char* fName = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(fileName);
+					array<PointF>^ points = gcnew array<PointF>(getSize(fName));
+					if (points->Length < 2)
+						return;
+					PointF point;
+					FILE* fLog = fopen(fName, "r");
+					int x, y;
+					for (int i = 0; fscanf(fLog, "%d\t%d\n", &x, &y) != EOF; i++) {
+						point.X = x;
+						point.Y = y;
+						points[i] = point;
+					}
+					fclose(fLog);
+					gr->FillPolygon(br1, points);
+				}
+			}
+
+			//contours
+
+			String^ fileName = "Skeleton1\\pic1.txt";
+			for (int i = 1; i < 4; i++) {
+				fileName = fileName->Substring(0, 13);
+				fileName += i + ".txt";
+				char* fName = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(fileName);
+				array<PointF>^ points = gcnew array<PointF>(getSize(fName));
+				if (points->Length < 2)
+					return;
+				PointF point;
+				FILE* fLog = fopen(fName, "r");
+				int x, y;
+				for (int i = 0; fscanf(fLog, "%d\t%d\n", &x, &y) != EOF; i++) {
+					point.X = x;
+					point.Y = y;
+					points[i] = point;
+				}
+				fclose(fLog);
+				gr->DrawLines(pn_line, points);
+			}
+		}
+
+		void drawSkeleton2() {
+			//fills
+
+			Brush^ br2 = gcnew SolidBrush(System::Drawing::Color::Black);
+			gr->FillRectangle(br2, 0, 0, pbPlot->Image->Width, pbPlot->Image->Height);
+			{
+				String^ fileName = "Skeleton2\\picf1.txt";
+				Brush^ br1;
+				for (int i = 1; i < 8; i++) {
+					if (i == 1)
+						br1 = gcnew SolidBrush(Color::DarkGray);
+					if (i == 2)
+						br1 = gcnew SolidBrush(Color::Black);
+					if (i == 3)
+						br1 = gcnew SolidBrush(Color::Gray);
+					fileName = fileName->Substring(0, 14);
+					fileName += i + ".txt";
+					char* fName = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(fileName);
+					array<PointF>^ points = gcnew array<PointF>(getSize(fName));
+					if (points->Length < 2)
+						return;
+					PointF point;
+					FILE* fLog = fopen(fName, "r");
+					int x, y;
+					for (int i = 0; fscanf(fLog, "%d\t%d\n", &x, &y) != EOF; i++) {
+						point.X = x;
+						point.Y = y;
+						points[i] = point;
+					}
+					fclose(fLog);
+					gr->FillPolygon(br1, points);
+				}
+			}
+
+			//contours
+
+			String^ fileName = "Skeleton2\\pic1.txt";
+			for (int i = 1; i < 34; i++) {
+				fileName = fileName->Substring(0, 13);
+				fileName += i + ".txt";
+				char* fName = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(fileName);
+				array<PointF>^ points = gcnew array<PointF>(getSize(fName));
+				if (points->Length < 2)
+					return;
+				PointF point;
+				FILE* fLog = fopen(fName, "r");
+				int x, y;
+				for (int i = 0; fscanf(fLog, "%d\t%d\n", &x, &y) != EOF; i++) {
+					point.X = x;
+					point.Y = y;
+					points[i] = point;
+				}
+				fclose(fLog);
+				gr->DrawLines(pn_line, points);
+			}
+
+
+
+			//another fill
+
+			fileName = "Skeleton2\\picf8.txt";
+			Brush^ br1 = gcnew SolidBrush(Color::Brown);
+			char* fName = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(fileName);
+			array<PointF>^ points = gcnew array<PointF>(getSize(fName));
+			if (points->Length < 2)
+				return;
+			PointF point;
+			FILE* fLog = fopen(fName, "r");
+			int x, y;
+			for (int i = 0; fscanf(fLog, "%d\t%d\n", &x, &y) != EOF; i++) {
+				point.X = x;
+				point.Y = y;
+				points[i] = point;
+			}
+			fclose(fLog);
+			gr->FillPolygon(br1, points);
+
+			//another contour
+
+			fileName = "Skeleton2\\picAdd.txt";
+			fName = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(fileName);
+			points = gcnew array<PointF>(getSize(fName));
+			if (points->Length < 2)
+				return;
+			fLog = fopen(fName, "r");
+			for (int i = 0; fscanf(fLog, "%d\t%d\n", &x, &y) != EOF; i++) {
+				point.X = x;
+				point.Y = y;
+				points[i] = point;
+			}
+			fclose(fLog);
+			gr->DrawLines(pn_line, points);
+		}
+
+		//Scene 6
+
+		
 
 private: System::Void MyForm_KeyPress(System::Object^ sender, System::Windows::Forms::KeyPressEventArgs^ e) {
 	if (Convert::ToInt16(e->KeyChar) == Convert::ToInt16(System::Windows::Forms::Keys::C))
