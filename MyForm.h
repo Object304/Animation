@@ -194,9 +194,12 @@ namespace Graphic {
 			drawInside1();
 			drawInside2();
 			drawKnight2();
-			*/
-			//drawInside3();
-			drawSkeleton2();
+			drawInside3();
+			drawSkeleton2();*/
+
+			drawInside3();
+			drawHand();
+
 			pbPlot->Refresh();
 		}
 
@@ -676,7 +679,52 @@ namespace Graphic {
 
 		//Scene 6
 
-		
+		void drawHand() {
+
+			//fills
+
+			{
+				String^ fileName = "Hand\\picf1.txt";
+				Brush^ br1 = gcnew SolidBrush(Color::LightGray);
+				char* fName = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(fileName);
+				array<PointF>^ points = gcnew array<PointF>(getSize(fName));
+				if (points->Length < 2)
+					return;
+				PointF point;
+				FILE* fLog = fopen(fName, "r");
+				int x, y;
+				for (int i = 0; fscanf(fLog, "%d\t%d\n", &x, &y) != EOF; i++) {
+					point.X = x;
+					point.Y = y;
+					points[i] = point;
+				}
+				fclose(fLog);
+				gr->FillPolygon(br1, points);
+				
+			}
+
+			//contours
+
+			String^ fileName = "Hand\\pic1.txt";
+			for (int i = 1; i < 24; i++) {
+				fileName = fileName->Substring(0, 8);
+				fileName += i + ".txt";
+				char* fName = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(fileName);
+				array<PointF>^ points = gcnew array<PointF>(getSize(fName));
+				if (points->Length < 2)
+					return;
+				PointF point;
+				FILE* fLog = fopen(fName, "r");
+				int x, y;
+				for (int i = 0; fscanf(fLog, "%d\t%d\n", &x, &y) != EOF; i++) {
+					point.X = x;
+					point.Y = y;
+					points[i] = point;
+				}
+				fclose(fLog);
+				gr->DrawLines(pn_line, points);
+			}
+		}
 
 private: System::Void MyForm_KeyPress(System::Object^ sender, System::Windows::Forms::KeyPressEventArgs^ e) {
 	if (Convert::ToInt16(e->KeyChar) == Convert::ToInt16(System::Windows::Forms::Keys::C))
