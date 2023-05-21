@@ -192,7 +192,7 @@ namespace Graphic {
 			drawGround();
 			drawKnight1();*/
 
-			drawInside1();
+			drawInside2();
 
 			pbPlot->Refresh();
 		}
@@ -401,7 +401,60 @@ namespace Graphic {
 		}
 
 		void drawInside2() {
+			{
+				String^ fileName = "Inside2\\picf1.txt";
+				Brush^ br1 = gcnew SolidBrush(Color::DarkGray);
+				gr->FillRectangle(br1, 0, 0, pbPlot->Image->Width, pbPlot->Image->Height);
+				for (int i = 1; i < 13; i++) {
+					if (i == 1)
+						br1 = gcnew SolidBrush(Color::Gray);
+					if (i == 2)
+						br1 = gcnew SolidBrush(Color::DarkOrange);
+					if (i == 3 || i == 4)
+						br1 = gcnew SolidBrush(Color::Gray);
+					if (i == 5)
+						br1 = gcnew SolidBrush(Color::DarkOrange);
+					if (i == 11)
+						br1 = gcnew SolidBrush(Color::Black);
+					fileName = fileName->Substring(0, 12);
+					fileName += i + ".txt";
+					char* fName = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(fileName);
+					array<PointF>^ points = gcnew array<PointF>(getSize(fName));
+					if (points->Length < 2)
+						return;
+					PointF point;
+					FILE* fLog = fopen(fName, "r");
+					int x, y;
+					for (int i = 0; fscanf(fLog, "%d\t%d\n", &x, &y) != EOF; i++) {
+						point.X = x;
+						point.Y = y;
+						points[i] = point;
+					}
+					fclose(fLog);
+					gr->FillPolygon(br1, points);
+				}
+			}
 
+
+			String^ fileName = "Inside2\\pic1.txt";
+			for (int i = 1; i < 31; i++) {
+				fileName = fileName->Substring(0, 11);
+				fileName += i + ".txt";
+				char* fName = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(fileName);
+				array<PointF>^ points = gcnew array<PointF>(getSize(fName));
+				if (points->Length < 2)
+					return;
+				PointF point;
+				FILE* fLog = fopen(fName, "r");
+				int x, y;
+				for (int i = 0; fscanf(fLog, "%d\t%d\n", &x, &y) != EOF; i++) {
+					point.X = x;
+					point.Y = y;
+					points[i] = point;
+				}
+				fclose(fLog);
+				gr->DrawLines(pn_line, points);
+			}
 		}
 
 private: System::Void MyForm_KeyPress(System::Object^ sender, System::Windows::Forms::KeyPressEventArgs^ e) {
