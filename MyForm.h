@@ -191,8 +191,10 @@ namespace Graphic {
 			drawCastle();
 			drawGround();
 			drawKnight1();*/
-
+			//drawInside1();
 			drawInside2();
+			drawKnight2();
+			
 
 			pbPlot->Refresh();
 		}
@@ -438,6 +440,63 @@ namespace Graphic {
 
 			String^ fileName = "Inside2\\pic1.txt";
 			for (int i = 1; i < 31; i++) {
+				fileName = fileName->Substring(0, 11);
+				fileName += i + ".txt";
+				char* fName = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(fileName);
+				array<PointF>^ points = gcnew array<PointF>(getSize(fName));
+				if (points->Length < 2)
+					return;
+				PointF point;
+				FILE* fLog = fopen(fName, "r");
+				int x, y;
+				for (int i = 0; fscanf(fLog, "%d\t%d\n", &x, &y) != EOF; i++) {
+					point.X = x;
+					point.Y = y;
+					points[i] = point;
+				}
+				fclose(fLog);
+				gr->DrawLines(pn_line, points);
+			}
+		}
+
+		void drawKnight2() {
+			//fills
+
+			{
+				String^ fileName = "Knight2\\picf1.txt";
+				Brush^ br1;
+				for (int i = 1; i < 5; i++) {
+					if (i == 1)
+						br1 = gcnew SolidBrush(Color::DarkGray);
+					if (i == 2)
+						br1 = gcnew SolidBrush(Color::Gray);
+					if (i == 3)
+						br1 = gcnew SolidBrush(Color::Gray);
+					if (i == 4)
+						br1 = gcnew SolidBrush(Color::Orange);
+					fileName = fileName->Substring(0, 12);
+					fileName += i + ".txt";
+					char* fName = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(fileName);
+					array<PointF>^ points = gcnew array<PointF>(getSize(fName));
+					if (points->Length < 2)
+						return;
+					PointF point;
+					FILE* fLog = fopen(fName, "r");
+					int x, y;
+					for (int i = 0; fscanf(fLog, "%d\t%d\n", &x, &y) != EOF; i++) {
+						point.X = x;
+						point.Y = y;
+						points[i] = point;
+					}
+					fclose(fLog);
+					gr->FillPolygon(br1, points);
+				}
+			}
+
+			//contours
+
+			String^ fileName = "Knight2\\pic1.txt";
+			for (int i = 1; i < 61; i++) {
 				fileName = fileName->Substring(0, 11);
 				fileName += i + ".txt";
 				char* fName = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(fileName);
