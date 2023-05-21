@@ -111,7 +111,7 @@ namespace Graphic {
 		System::Drawing::Font^ printFont;
 		Graphics^ gr;
 		bool mouseClick = false;
-		const char* curName = "Data\\picf1.txt";
+		const char* curName = "Data\\pic1.txt";
 		int curNum = 1;
 
 		void WorkSpace() {
@@ -120,7 +120,7 @@ namespace Graphic {
 
 		void updateName() {
 			String^ str = gcnew String(curName);
-			str = str->Substring(0, 9);
+			str = str->Substring(0, 8);
 			curNum++;
 			curName = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(str + curNum + ".txt");
 		}
@@ -185,6 +185,19 @@ namespace Graphic {
 			updateName();
 			pbPlot->Refresh();
 		}
+
+		void GO() {
+			/*drawSky();
+			drawCastle();
+			drawGround();
+			drawKnight1();*/
+
+			drawInside1();
+
+			pbPlot->Refresh();
+		}
+
+		//Scene 1
 
 		void drawGround() {
 			String^ fileName = "Ground\\pic1.txt";
@@ -329,12 +342,66 @@ namespace Graphic {
 			}
 		}
 
-		void GO() {
-			drawSky();
-			drawCastle();
-			drawGround();
-			drawKnight1();
-			pbPlot->Refresh();
+		//Scenes 2, 3
+
+		void drawInside1() {
+
+			{
+				String^ fileName = "Inside1\\picf1.txt";
+				Brush^ br1 = gcnew SolidBrush(Color::DarkGray);
+				gr->FillRectangle(br1, 0, 0, pbPlot->Image->Width, pbPlot->Image->Height);
+				for (int i = 1; i < 11; i++) {
+					if (i == 1)
+						br1 = gcnew SolidBrush(Color::Gray);
+					if (i == 2)
+						br1 = gcnew SolidBrush(Color::Gray);
+					if (i == 3 || i == 4)
+						br1 = gcnew SolidBrush(Color::Black);
+					if (i == 5)
+						br1 = gcnew SolidBrush(Color::DarkOrange);
+					fileName = fileName->Substring(0, 12);
+					fileName += i + ".txt";
+					char* fName = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(fileName);
+					array<PointF>^ points = gcnew array<PointF>(getSize(fName));
+					if (points->Length < 2)
+						return;
+					PointF point;
+					FILE* fLog = fopen(fName, "r");
+					int x, y;
+					for (int i = 0; fscanf(fLog, "%d\t%d\n", &x, &y) != EOF; i++) {
+						point.X = x;
+						point.Y = y;
+						points[i] = point;
+					}
+					fclose(fLog);
+					gr->FillPolygon(br1, points);
+				}
+			}
+
+
+			String^ fileName = "Inside1\\pic1.txt";
+			for (int i = 1; i < 30; i++) {
+				fileName = fileName->Substring(0, 11);
+				fileName += i + ".txt";
+				char* fName = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(fileName);
+				array<PointF>^ points = gcnew array<PointF>(getSize(fName));
+				if (points->Length < 2)
+					return;
+				PointF point;
+				FILE* fLog = fopen(fName, "r");
+				int x, y;
+				for (int i = 0; fscanf(fLog, "%d\t%d\n", &x, &y) != EOF; i++) {
+					point.X = x;
+					point.Y = y;
+					points[i] = point;
+				}
+				fclose(fLog);
+				gr->DrawLines(pn_line, points);
+			}
+		}
+
+		void drawInside2() {
+
 		}
 
 private: System::Void MyForm_KeyPress(System::Object^ sender, System::Windows::Forms::KeyPressEventArgs^ e) {
