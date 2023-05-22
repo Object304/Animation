@@ -30,7 +30,7 @@ namespace Graphic {
 			br = gcnew SolidBrush(Color::White);
 			br_text = gcnew SolidBrush(Color::Black);
 			pn_axes = gcnew Pen(Color::Black, 3);
-			pn_line = gcnew Pen(Color::Black, 3);
+			pn_line = gcnew Pen(Color::Black, 4);
 			pn_grid = gcnew Pen(Color::Gray, 1);
 			printFont = gcnew System::Drawing::Font("Arial", 8);
 			gr = Graphics::FromImage(pbPlot->Image);
@@ -187,18 +187,19 @@ namespace Graphic {
 		}
 
 		void GO() {
-			/*drawSky();
-			drawCastle();
-			drawGround();
-			drawKnight1();
-			drawInside1();
-			drawInside2();
-			drawKnight2();
+			//drawSky();
+			//drawCastle();
+			//drawGround();
+			//drawKnight1();
+			//drawInside1();
+			//drawInside2();
+			//drawKnight2();
 			drawInside3();
-			drawSkeleton2();*/
+			drawSkeleton1();
+			drawSkeleton2();
 
-			drawInside3();
-			drawHand();
+			//drawInside3();
+			//drawHand();
 
 			pbPlot->Refresh();
 		}
