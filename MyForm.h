@@ -48,7 +48,7 @@ namespace Graphic {
 			}
 		}
 	private: System::Windows::Forms::PictureBox^ pbPlot;
-	private: System::Windows::Forms::TextBox^ tbIn;
+
 	protected:
 	private:
 		/// <summary>
@@ -64,7 +64,6 @@ namespace Graphic {
 		void InitializeComponent(void)
 		{
 			this->pbPlot = (gcnew System::Windows::Forms::PictureBox());
-			this->tbIn = (gcnew System::Windows::Forms::TextBox());
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pbPlot))->BeginInit();
 			this->SuspendLayout();
 			// 
@@ -79,19 +78,11 @@ namespace Graphic {
 			this->pbPlot->TabStop = false;
 			this->pbPlot->MouseClick += gcnew System::Windows::Forms::MouseEventHandler(this, &MyForm::pbPlot_MouseClick);
 			// 
-			// tbIn
-			// 
-			this->tbIn->Location = System::Drawing::Point(716, 261);
-			this->tbIn->Name = L"tbIn";
-			this->tbIn->Size = System::Drawing::Size(100, 20);
-			this->tbIn->TabIndex = 1;
-			// 
 			// MyForm
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 			this->ClientSize = System::Drawing::Size(992, 620);
-			this->Controls->Add(this->tbIn);
 			this->Controls->Add(this->pbPlot);
 			this->KeyPreview = true;
 			this->Margin = System::Windows::Forms::Padding(2);
@@ -101,7 +92,6 @@ namespace Graphic {
 			this->KeyPress += gcnew System::Windows::Forms::KeyPressEventHandler(this, &MyForm::MyForm_KeyPress);
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pbPlot))->EndInit();
 			this->ResumeLayout(false);
-			this->PerformLayout();
 
 		}
 #pragma endregion
@@ -163,7 +153,7 @@ namespace Graphic {
 			gr->FillRectangle(br, 0, 0, pbPlot->Image->Width, pbPlot->Image->Height);
 			curNum = 1;
 			String^ fileName = "Data\\pic1.txt";
-			for (int i = 1; i < Convert::ToInt16(tbIn->Text); i++) {
+			for (int i = 1; i < 6/*Convert::ToInt16(tbIn->Text)*/; i++) {
 				fileName = fileName->Substring(0, 8);
 				fileName += i + ".txt";
 				char* fName = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(fileName);
@@ -187,19 +177,34 @@ namespace Graphic {
 		}
 
 		void GO() {
-			//drawSky();
-			//drawCastle();
-			//drawGround();
-			//drawKnight1();
-			//drawInside1();
+
+			//Scene 1
+
+			drawSky();
+			drawCastle();
+			drawGround();
+			drawKnight1();
+			 
+			//Scenes 2, 3
+			//drawInside1(); 
 			//drawInside2();
 			//drawKnight2();
-			drawInside3();
-			drawSkeleton1();
-			drawSkeleton2();
+			
+			//Scenes 4, 5
+
+			//drawInside3();
+			//drawSkeleton1();
+			//drawSkeleton2();
+
+			//Scene 6
 
 			//drawInside3();
 			//drawHand();
+
+			//Scene 7
+
+			//drawInside3();
+			//drawSkeleton3();
 
 			pbPlot->Refresh();
 		}
@@ -537,7 +542,7 @@ namespace Graphic {
 				Brush^ br1;
 				for (int i = 1; i < 6; i++) {
 					if (i == 1)
-						br1 = gcnew SolidBrush(Color::White);
+						br1 = gcnew SolidBrush(Color::GhostWhite);
 					if (i == 4)
 						br1 = gcnew SolidBrush(Color::DarkSlateGray);
 					if (i == 5)
@@ -727,6 +732,65 @@ namespace Graphic {
 			}
 		}
 
+		//Scene 7
+
+		void drawSkeleton3() {
+			//fills
+
+			{
+				String^ fileName = "Skeleton3\\picf1.txt";
+				Brush^ br1;
+				for (int i = 1; i < 11; i++) {
+					if (i == 1)
+						br1 = gcnew SolidBrush(Color::DarkSlateGray);
+					if (i == 2)
+						br1 = gcnew SolidBrush(Color::Brown);
+					if (i == 3)
+						br1 = gcnew SolidBrush(Color::GhostWhite);
+					if (i == 7)
+						br1 = gcnew SolidBrush(Color::Gray);
+					fileName = fileName->Substring(0, 14);
+					fileName += i + ".txt";
+					char* fName = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(fileName);
+					array<PointF>^ points = gcnew array<PointF>(getSize(fName));
+					if (points->Length < 2)
+						return;
+					PointF point;
+					FILE* fLog = fopen(fName, "r");
+					int x, y;
+					for (int i = 0; fscanf(fLog, "%d\t%d\n", &x, &y) != EOF; i++) {
+						point.X = x;
+						point.Y = y;
+						points[i] = point;
+					}
+					fclose(fLog);
+					gr->FillPolygon(br1, points);
+				}
+			}
+
+			//contours
+
+			String^ fileName = "Skeleton3\\pic1.txt";
+			for (int i = 1; i < 24; i++) {
+				fileName = fileName->Substring(0, 13);
+				fileName += i + ".txt";
+				char* fName = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(fileName);
+				array<PointF>^ points = gcnew array<PointF>(getSize(fName));
+				if (points->Length < 2)
+					return;
+				PointF point;
+				FILE* fLog = fopen(fName, "r");
+				int x, y;
+				for (int i = 0; fscanf(fLog, "%d\t%d\n", &x, &y) != EOF; i++) {
+					point.X = x;
+					point.Y = y;
+					points[i] = point;
+				}
+				fclose(fLog);
+				gr->DrawLines(pn_line, points);
+			}
+		}
+
 private: System::Void MyForm_KeyPress(System::Object^ sender, System::Windows::Forms::KeyPressEventArgs^ e) {
 	if (Convert::ToInt16(e->KeyChar) == Convert::ToInt16(System::Windows::Forms::Keys::C))
 		Clear();
@@ -745,6 +809,41 @@ private: System::Void MyForm_KeyPress(System::Object^ sender, System::Windows::F
 	}
 	if (Convert::ToInt16(e->KeyChar) == Convert::ToInt16(System::Windows::Forms::Keys::G)) {
 		GO();
+	}
+	if (Convert::ToInt16(e->KeyChar) == Convert::ToInt16(System::Windows::Forms::Keys::D1)) {
+		drawSky();
+		drawCastle();
+		drawGround();
+		drawKnight1();
+		pbPlot->Refresh();
+	}
+	if (Convert::ToInt16(e->KeyChar) == Convert::ToInt16(System::Windows::Forms::Keys::D2)) {
+		drawInside1();
+		pbPlot->Refresh();
+	}
+	if (Convert::ToInt16(e->KeyChar) == Convert::ToInt16(System::Windows::Forms::Keys::D3)) {
+		drawInside2();
+		drawKnight2();
+		pbPlot->Refresh();
+	}
+	if (Convert::ToInt16(e->KeyChar) == Convert::ToInt16(System::Windows::Forms::Keys::D4)) {
+		drawInside3();
+		drawSkeleton1();
+		pbPlot->Refresh();
+	}
+	if (Convert::ToInt16(e->KeyChar) == Convert::ToInt16(System::Windows::Forms::Keys::D5)) {
+		drawSkeleton2();
+		pbPlot->Refresh();
+	}
+	if (Convert::ToInt16(e->KeyChar) == Convert::ToInt16(System::Windows::Forms::Keys::D6)) {
+		drawInside3();
+		drawHand();
+		pbPlot->Refresh();
+	}
+	if (Convert::ToInt16(e->KeyChar) == Convert::ToInt16(System::Windows::Forms::Keys::D7)) {
+		drawInside3();
+		drawSkeleton3();
+		pbPlot->Refresh();
 	}
 }
 private: System::Void pbPlot_MouseClick(System::Object^ sender, System::Windows::Forms::MouseEventArgs^ e) {
