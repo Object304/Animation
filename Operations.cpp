@@ -1,7 +1,7 @@
 #pragma once
 #include <cassert>
 #include <math.h>
-#include "Works.h"
+#include "Operations.h"
 
 void multiply(array<float, 2>^ A, array<float, 2>^ B, array<float, 2>^ C) {
 	int n = A->GetLength(0), m = B->GetLength(1), k = A->GetLength(1);

@@ -4,8 +4,9 @@
 #include <array>
 #include <fstream>
 #include <iostream>
-#include "Works.h"
-#include "MyStruct.h"
+#include "Operations.h"
+#include "Trajectory.h"
+#include "Classes.h"
 
 namespace Graphic {
 
@@ -37,8 +38,8 @@ namespace Graphic {
 			printFont = gcnew System::Drawing::Font("Arial", 8);
 			gr = Graphics::FromImage(pbPlot->Image);
 
-			knight1.dx = 0;
-			knight1.dy = 0;
+			knight1 = gcnew Knight1;
+			castle = gcnew Castle;
 		}
 
 	protected:
@@ -113,18 +114,22 @@ namespace Graphic {
 		System::Drawing::Font^ printFont;
 		Graphics^ gr;
 		bool mouseClick = false;
-		const char* curName = "Data\\picf1.txt";
+		const char* curName = "Data\\pic1.txt";
 		int curNum = 1;
-		array<float, 2>^ Mod;
-		Knight1 knight1;
+		int ticks = 0;
+		Knight1^ knight1;
+		Castle^ castle;
+		float radius = 0;
+		
 
 		void WorkSpace() {
-			restore();
+			//restore();
+			timer1->Enabled = true;
 		}
 
 		void updateName() {
 			String^ str = gcnew String(curName);
-			str = str->Substring(0, 9);
+			str = str->Substring(0, 8);
 			curNum++;
 			curName = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(str + curNum + ".txt");
 		}
@@ -208,7 +213,7 @@ namespace Graphic {
 
 			//drawInside3();
 			//drawSkeleton1();
-			//drawSkeleton2();
+			drawSkeleton2();
 
 			//Scene 6
 
@@ -258,6 +263,12 @@ namespace Graphic {
 
 		void drawKnight1() {
 
+			/////////////////////////////////////
+
+			array<float, 2>^ M = knight1->Tr->next();
+
+			/////////////////////////////////////
+			
 			//fills
 
 			{
@@ -272,8 +283,6 @@ namespace Graphic {
 						br1 = gcnew SolidBrush(Color::Orange);
 					if (i == 5 || i == 4)
 						br1 = gcnew SolidBrush(Color::Gray);
-					/*if (i == 6)
-						br1 = gcnew SolidBrush(Color::Gray);*/
 					fileName = fileName->Substring(0, 12);
 					fileName += i + ".txt";
 					char* fName = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(fileName);
@@ -284,25 +293,21 @@ namespace Graphic {
 					FILE* fLog = fopen(fName, "r");
 					int x, y;
 					for (int i = 0; fscanf(fLog, "%d\t%d\n", &x, &y) != EOF; i++) {
-						
-
-						////////////////
-
-						Mod[0, 0] = x;
-						Mod[0, 1] = y;
-						Mod[0, 2] = 1;
-						move_mat(knight1.dx, knight1.dy, knight1.Trans);
-						multiply(knight1.Trans, Mod, Mod);
-
-						point.X = Mod[0, 0];
-						point.Y = Mod[0, 1];
-
-						////////////////
-
+						point.X = x;
+						point.Y = y;
 						points[i] = point;
 					}
 					fclose(fLog);
-					gr->FillPolygon(br1, points);
+
+					///////////////////////
+
+					knight1->add(points);
+					for (int i = 0; i < knight1->initial->Length; i++)
+						knight1->transformed[i] = apply(knight1->initial[i], M);
+					
+					///////////////////////
+
+					gr->FillPolygon(br1, knight1->transformed);
 				}
 			}
 
@@ -320,28 +325,27 @@ namespace Graphic {
 				FILE* fLog = fopen(fName, "r");
 				int x, y;
 				for (int i = 0; fscanf(fLog, "%d\t%d\n", &x, &y) != EOF; i++) {
-
-					////////////////
-
-					Mod[0, 0] = x;
-					Mod[0, 1] = y;
-					Mod[0, 2] = 1;
-					move_mat(knight1.dx, knight1.dy, knight1.Trans);
-					multiply(knight1.Trans, Mod, Mod);
-
-					point.X = Mod[0, 0];
-					point.Y = Mod[0, 1];
-
-					////////////////
-
+					point.X = x;
+					point.Y = y;
 					points[i] = point;
 				}
 				fclose(fLog);
-				gr->DrawLines(pn_line, points);
+
+				knight1->add(points);
+				for (int i = 0; i < knight1->initial->Length; i++)
+					knight1->transformed[i] = apply(knight1->initial[i], M);
+
+				gr->DrawLines(pn_line, knight1->transformed);
 			}
 		}
 
 		void drawCastle() {
+
+			/////////////////////////////////////
+
+			array<float, 2>^ M = castle->Tr->next();
+
+			/////////////////////////////////////
 
 			{
 				String^ fileName = "Castle\\picf1.txt";
@@ -368,7 +372,16 @@ namespace Graphic {
 						points[i] = point;
 					}
 					fclose(fLog);
-					gr->FillPolygon(br1, points);
+
+					///////////////////////
+
+					castle->add(points);
+					for (int i = 0; i < castle->initial->Length; i++)
+						castle->transformed[i] = apply(castle->initial[i], M);
+
+					///////////////////////
+
+					gr->FillPolygon(br1, castle->transformed);
 				}
 			}
 
@@ -389,7 +402,16 @@ namespace Graphic {
 					points[i] = point;
 				}
 				fclose(fLog);
-				gr->DrawLines(pn_line, points);
+
+				///////////////////////
+
+				castle->add(points);
+				for (int i = 0; i < castle->initial->Length; i++)
+					castle->transformed[i] = apply(castle->initial[i], M);
+
+				///////////////////////
+
+				gr->DrawLines(pn_line, castle->transformed);
 			}
 		}
 
@@ -830,6 +852,29 @@ namespace Graphic {
 			}
 		}
 
+		void drawLightning(int key) {
+			String^ fileName = "Lightning\\pic1.txt";
+			for (int i = key; i < 11; i += 2) {
+				fileName = fileName->Substring(0, 13);
+				fileName += i + ".txt";
+				char* fName = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(fileName);
+				array<PointF>^ points = gcnew array<PointF>(getSize(fName));
+				if (points->Length < 2)
+					return;
+				PointF point;
+				FILE* fLog = fopen(fName, "r");
+				int x, y;
+				for (int i = 0; fscanf(fLog, "%d\t%d\n", &x, &y) != EOF; i++) {
+					point.X = x;
+					point.Y = y;
+					points[i] = point;
+				}
+				fclose(fLog);
+				Pen^ lightning = gcnew Pen(Color::BlueViolet, 3);
+				gr->DrawLines(lightning, points);
+			}
+		}
+
 private: System::Void MyForm_KeyPress(System::Object^ sender, System::Windows::Forms::KeyPressEventArgs^ e) {
 	if (Convert::ToInt16(e->KeyChar) == Convert::ToInt16(System::Windows::Forms::Keys::C))
 		Clear();
@@ -884,6 +929,9 @@ private: System::Void MyForm_KeyPress(System::Object^ sender, System::Windows::F
 		drawSkeleton3();
 		pbPlot->Refresh();
 	}
+	if (Convert::ToInt16(e->KeyChar) == Convert::ToInt16(System::Windows::Forms::Keys::S)) {
+		ticks += 50;
+	}
 }
 private: System::Void pbPlot_MouseClick(System::Object^ sender, System::Windows::Forms::MouseEventArgs^ e) {
 	FILE* fLog = fopen(curName, "a");
@@ -892,12 +940,83 @@ private: System::Void pbPlot_MouseClick(System::Object^ sender, System::Windows:
 	Draw();
 }
 private: System::Void timer1_Tick(System::Object^ sender, System::EventArgs^ e) {
-	drawSky();
-	drawCastle();
-	drawGround();
-	drawKnight1();
-	knight1.dx++;
-	knight1.dy++;
+	ticks++;
+	if (ticks < 325) {
+		gr->FillRectangle(br, 0, 0, pbPlot->Image->Width, pbPlot->Image->Height);
+		drawSky();
+		drawCastle();
+		drawGround();
+		drawKnight1();
+		pbPlot->Refresh();
+	}
+	if (ticks > 375 && ticks < 425) {
+		gr->FillRectangle(br, 0, 0, pbPlot->Image->Width, pbPlot->Image->Height);
+		drawInside1();
+		pbPlot->Refresh();
+	}
+	if (ticks > 425 && ticks < 475) {
+		gr->FillRectangle(br, 0, 0, pbPlot->Image->Width, pbPlot->Image->Height);
+		drawInside1();
+		drawInside2();
+		drawKnight2();
+		pbPlot->Refresh();
+	}
+	if (ticks > 475 && ticks < 525) {
+		gr->FillRectangle(br, 0, 0, pbPlot->Image->Width, pbPlot->Image->Height);
+		drawInside3();
+		drawSkeleton1();
+		pbPlot->Refresh();
+	}
+	if (ticks > 525 && ticks < 575) {
+		gr->FillRectangle(br, 0, 0, pbPlot->Image->Width, pbPlot->Image->Height);
+		drawSkeleton2();
+		pbPlot->Refresh();
+	}
+	if (ticks > 575 && ticks < 600) {
+		Brush^ br1 = gcnew SolidBrush(Color::Blue);
+		Brush^ br2 = gcnew SolidBrush(Color::BlueViolet);
+		gr->FillRectangle(br, 0, 0, pbPlot->Image->Width, pbPlot->Image->Height);
+		drawSkeleton2();
+		radius += 0.8;
+
+
+		array<PointF>^ points = gcnew array<PointF>(3);
+		points[0] = PointF(343, 277 + 10);
+		points[1] = PointF(343, 277 - 10);
+		points[2] = PointF(343 - radius * radius, 277);
+		gr->FillPolygon(br2, points);
+		points[2] = PointF(343 + radius * radius, 277);
+		gr->FillPolygon(br2, points);
+		points[0] = PointF(343 - 10, 277);
+		points[1] = PointF(343 + 10, 277);
+		points[2] = PointF(343, 277 - radius * radius);
+		gr->FillPolygon(br2, points);
+		points[2] = PointF(343, 277 + radius * radius);
+		gr->FillPolygon(br2, points);
+
+
+		gr->FillEllipse(br1, 343 - radius, 277 - radius, 2 * radius, 2 * radius);
+		gr->FillEllipse(br1, 466 - radius, 241 - radius, 2 * radius, 2 * radius);
+		pbPlot->Refresh();
+	}
+	if (ticks > 600 && ticks < 675) {
+		Brush^ br1 = gcnew SolidBrush(Color::Blue);
+		drawSkeleton2();
+		gr->FillEllipse(br1, 343 - radius, 277 - radius, 2 * radius, 2 * radius);
+		gr->FillEllipse(br1, 466 - radius, 241 - radius, 2 * radius, 2 * radius);
+		pbPlot->Refresh();
+	}
+	if (ticks > 675 && ticks < 725) {
+		gr->FillRectangle(br, 0, 0, pbPlot->Image->Width, pbPlot->Image->Height);
+		drawInside3();
+		drawHand();
+		int key = 1 + ticks % 2;
+		drawLightning(key);
+
+
+
+		pbPlot->Refresh();
+	}
 }
 };
 }
