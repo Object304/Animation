@@ -116,6 +116,7 @@
   <ItemGroup>
     <ClCompile Include="MyForm.cpp" />
     <ClCompile Include="Source.cpp" />
+    <ClCompile Include="Works.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -125,6 +126,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="MyStruct.h" />
+    <ClInclude Include="Works.h" />
     <ClInclude Include="MyForm.h">
       <FileType>CppForm</FileType>
     </ClInclude>

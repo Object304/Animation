@@ -4,6 +4,8 @@
 #include <array>
 #include <fstream>
 #include <iostream>
+#include "Works.h"
+#include "MyStruct.h"
 
 namespace Graphic {
 
@@ -34,6 +36,9 @@ namespace Graphic {
 			pn_grid = gcnew Pen(Color::Gray, 1);
 			printFont = gcnew System::Drawing::Font("Arial", 8);
 			gr = Graphics::FromImage(pbPlot->Image);
+
+			knight1.dx = 0;
+			knight1.dy = 0;
 		}
 
 	protected:
@@ -48,13 +53,15 @@ namespace Graphic {
 			}
 		}
 	private: System::Windows::Forms::PictureBox^ pbPlot;
+	private: System::Windows::Forms::Timer^ timer1;
+	private: System::ComponentModel::IContainer^ components;
 
 	protected:
 	private:
 		/// <summary>
 		/// Обязательная переменная конструктора.
 		/// </summary>
-		System::ComponentModel::Container ^components;
+
 
 #pragma region Windows Form Designer generated code
 		/// <summary>
@@ -63,29 +70,34 @@ namespace Graphic {
 		/// </summary>
 		void InitializeComponent(void)
 		{
+			this->components = (gcnew System::ComponentModel::Container());
 			this->pbPlot = (gcnew System::Windows::Forms::PictureBox());
+			this->timer1 = (gcnew System::Windows::Forms::Timer(this->components));
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pbPlot))->BeginInit();
 			this->SuspendLayout();
 			// 
 			// pbPlot
 			// 
 			this->pbPlot->BorderStyle = System::Windows::Forms::BorderStyle::FixedSingle;
-			this->pbPlot->Location = System::Drawing::Point(8, 8);
-			this->pbPlot->Margin = System::Windows::Forms::Padding(2);
+			this->pbPlot->Location = System::Drawing::Point(12, 12);
 			this->pbPlot->Name = L"pbPlot";
-			this->pbPlot->Size = System::Drawing::Size(667, 586);
+			this->pbPlot->Size = System::Drawing::Size(1000, 900);
 			this->pbPlot->TabIndex = 0;
 			this->pbPlot->TabStop = false;
 			this->pbPlot->MouseClick += gcnew System::Windows::Forms::MouseEventHandler(this, &MyForm::pbPlot_MouseClick);
 			// 
+			// timer1
+			// 
+			this->timer1->Interval = 40;
+			this->timer1->Tick += gcnew System::EventHandler(this, &MyForm::timer1_Tick);
+			// 
 			// MyForm
 			// 
-			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
+			this->AutoScaleDimensions = System::Drawing::SizeF(9, 20);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
-			this->ClientSize = System::Drawing::Size(992, 620);
+			this->ClientSize = System::Drawing::Size(1488, 954);
 			this->Controls->Add(this->pbPlot);
 			this->KeyPreview = true;
-			this->Margin = System::Windows::Forms::Padding(2);
 			this->Name = L"MyForm";
 			this->Text = L"MyForm";
 			this->WindowState = System::Windows::Forms::FormWindowState::Maximized;
@@ -103,6 +115,8 @@ namespace Graphic {
 		bool mouseClick = false;
 		const char* curName = "Data\\picf1.txt";
 		int curNum = 1;
+		array<float, 2>^ Mod;
+		Knight1 knight1;
 
 		void WorkSpace() {
 			restore();
@@ -180,10 +194,10 @@ namespace Graphic {
 
 			//Scene 1
 
-			drawSky();
-			drawCastle();
-			drawGround();
-			drawKnight1();
+			//drawSky();
+			//drawCastle();
+			//drawGround();
+			//drawKnight1();
 			 
 			//Scenes 2, 3
 			//drawInside1(); 
@@ -270,8 +284,21 @@ namespace Graphic {
 					FILE* fLog = fopen(fName, "r");
 					int x, y;
 					for (int i = 0; fscanf(fLog, "%d\t%d\n", &x, &y) != EOF; i++) {
-						point.X = x;
-						point.Y = y;
+						
+
+						////////////////
+
+						Mod[0, 0] = x;
+						Mod[0, 1] = y;
+						Mod[0, 2] = 1;
+						move_mat(knight1.dx, knight1.dy, knight1.Trans);
+						multiply(knight1.Trans, Mod, Mod);
+
+						point.X = Mod[0, 0];
+						point.Y = Mod[0, 1];
+
+						////////////////
+
 						points[i] = point;
 					}
 					fclose(fLog);
@@ -293,8 +320,20 @@ namespace Graphic {
 				FILE* fLog = fopen(fName, "r");
 				int x, y;
 				for (int i = 0; fscanf(fLog, "%d\t%d\n", &x, &y) != EOF; i++) {
-					point.X = x;
-					point.Y = y;
+
+					////////////////
+
+					Mod[0, 0] = x;
+					Mod[0, 1] = y;
+					Mod[0, 2] = 1;
+					move_mat(knight1.dx, knight1.dy, knight1.Trans);
+					multiply(knight1.Trans, Mod, Mod);
+
+					point.X = Mod[0, 0];
+					point.Y = Mod[0, 1];
+
+					////////////////
+
 					points[i] = point;
 				}
 				fclose(fLog);
@@ -851,6 +890,14 @@ private: System::Void pbPlot_MouseClick(System::Object^ sender, System::Windows:
 	fprintf(fLog, "%d\t%d\n", e->X, e->Y);
 	fclose(fLog);
 	Draw();
+}
+private: System::Void timer1_Tick(System::Object^ sender, System::EventArgs^ e) {
+	drawSky();
+	drawCastle();
+	drawGround();
+	drawKnight1();
+	knight1.dx++;
+	knight1.dy++;
 }
 };
 }
