@@ -33,7 +33,7 @@ namespace Graphic {
 			br = gcnew SolidBrush(Color::White);
 			br_text = gcnew SolidBrush(Color::Black);
 			pn_line = gcnew Pen(Color::Black, 4);
-			printFont = gcnew System::Drawing::Font("Arial", 8);
+			printFont = gcnew System::Drawing::Font("Arial Bold Italic", 48);
 			gr = Graphics::FromImage(pbPlot->Image);
 
 			knight1 = gcnew Knight1;
@@ -1122,7 +1122,7 @@ private: System::Void MyForm_KeyPress(System::Object^ sender, System::Windows::F
 		pbPlot->Refresh();
 	}
 	if (Convert::ToInt16(e->KeyChar) == Convert::ToInt16(System::Windows::Forms::Keys::S)) {
-		ticks = 900;
+		ticks = 1120;
 	}
 }
 private: System::Void pbPlot_MouseClick(System::Object^ sender, System::Windows::Forms::MouseEventArgs^ e) {
@@ -1407,9 +1407,17 @@ private: System::Void timer1_Tick(System::Object^ sender, System::EventArgs^ e) 
 		gr->DrawLines(pn, points);
 		pbPlot->Refresh();
 	}
-	if (ticks > 1055) {
+	if (ticks > 1055 && ticks < 1120) {
 		Brush^ br1 = gcnew SolidBrush(Color::LightSkyBlue);
 		gr->FillRectangle(br1, 0, 0, pbPlot->Image->Width, pbPlot->Image->Height);
+		pbPlot->Refresh();
+	}
+	if (ticks > 1120 && ticks < 1150) {
+		Brush^ br1 = gcnew SolidBrush(Color::LightSkyBlue);
+		Brush^ br2 = gcnew SolidBrush(Color::Black);
+		gr->FillRectangle(br1, 0, 0, pbPlot->Image->Width, pbPlot->Image->Height);
+		gr->DrawString("std::cout << \"The End\";", printFont, br2, PointF((pbPlot->Image->Width) / 2 - 340, (pbPlot->Image->Height) / 2 - 50));
+		gr->DrawString(")))", printFont, br2, PointF((pbPlot->Image->Width) / 2 - 50, (pbPlot->Image->Height) / 2));
 		pbPlot->Refresh();
 	}
 }
