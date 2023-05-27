@@ -54,6 +54,7 @@ namespace Graphic {
 		}
 	private: System::Windows::Forms::PictureBox^ pbPlot;
 	private: System::Windows::Forms::Timer^ timer1;
+
 	private: System::ComponentModel::IContainer^ components;
 
 	protected:
@@ -79,9 +80,10 @@ namespace Graphic {
 			// pbPlot
 			// 
 			this->pbPlot->BorderStyle = System::Windows::Forms::BorderStyle::FixedSingle;
-			this->pbPlot->Location = System::Drawing::Point(12, 12);
+			this->pbPlot->Location = System::Drawing::Point(8, 8);
+			this->pbPlot->Margin = System::Windows::Forms::Padding(2);
 			this->pbPlot->Name = L"pbPlot";
-			this->pbPlot->Size = System::Drawing::Size(1000, 900);
+			this->pbPlot->Size = System::Drawing::Size(667, 586);
 			this->pbPlot->TabIndex = 0;
 			this->pbPlot->TabStop = false;
 			this->pbPlot->MouseClick += gcnew System::Windows::Forms::MouseEventHandler(this, &MyForm::pbPlot_MouseClick);
@@ -93,11 +95,12 @@ namespace Graphic {
 			// 
 			// MyForm
 			// 
-			this->AutoScaleDimensions = System::Drawing::SizeF(9, 20);
+			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
-			this->ClientSize = System::Drawing::Size(1488, 954);
+			this->ClientSize = System::Drawing::Size(992, 620);
 			this->Controls->Add(this->pbPlot);
 			this->KeyPreview = true;
+			this->Margin = System::Windows::Forms::Padding(2);
 			this->Name = L"MyForm";
 			this->Text = L"MyForm";
 			this->WindowState = System::Windows::Forms::FormWindowState::Maximized;
@@ -172,7 +175,7 @@ namespace Graphic {
 			gr->FillRectangle(br, 0, 0, pbPlot->Image->Width, pbPlot->Image->Height);
 			curNum = 1;
 			String^ fileName = "Data\\pic1.txt";
-			for (int i = 1; i < 6/*Convert::ToInt16(tbIn->Text)*/; i++) {
+			for (int i = 1; i < 24	/*Convert::ToInt16(tbIn->Text)*/; i++) {
 				fileName = fileName->Substring(0, 8);
 				fileName += i + ".txt";
 				char* fName = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(fileName);
@@ -222,8 +225,10 @@ namespace Graphic {
 
 			//Scene 7
 
-			drawInside3();
-			drawSkeleton3();
+			//drawInside3();
+			//drawSkeleton3();
+			drawSphere1();
+
 
 			pbPlot->Refresh();
 		}
@@ -798,6 +803,12 @@ namespace Graphic {
 		void drawSkeleton3() {
 			//fills
 
+			/////////////////////////////////////
+
+			array<float, 2>^ M = knight1->Tr->next();
+
+			/////////////////////////////////////
+
 			{
 				String^ fileName = "Skeleton3\\picf1.txt";
 				Brush^ br1;
@@ -825,7 +836,16 @@ namespace Graphic {
 						points[i] = point;
 					}
 					fclose(fLog);
-					gr->FillPolygon(br1, points);
+
+					///////////////////////
+
+					knight1->add(points);
+					for (int i = 0; i < knight1->initial->Length; i++)
+						knight1->transformed[i] = apply(knight1->initial[i], M);
+
+					///////////////////////
+
+					gr->FillPolygon(br1, knight1->transformed);
 				}
 			}
 
@@ -848,7 +868,12 @@ namespace Graphic {
 					points[i] = point;
 				}
 				fclose(fLog);
-				gr->DrawLines(pn_line, points);
+
+				knight1->add(points);
+				for (int i = 0; i < knight1->initial->Length; i++)
+					knight1->transformed[i] = apply(knight1->initial[i], M);
+
+				gr->DrawLines(pn_line, knight1->transformed);
 			}
 		}
 
@@ -903,7 +928,32 @@ namespace Graphic {
 				gr->FillPolygon(br1, sphere1->transformed);
 				
 			}
+			{
+				String^ fileName = "Sphere\\picf1.txt";
+				Brush^ br1 = gcnew SolidBrush(Color::BlueViolet);
+				char* fName = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(fileName);
+				array<PointF>^ points = gcnew array<PointF>(getSize(fName));
+				PointF point;
+				FILE* fLog = fopen(fName, "r");
+				int x, y;
+				for (int i = 0; fscanf(fLog, "%d\t%d\n", &x, &y) != EOF; i++) {
+					point.X = x;
+					point.Y = y;
+					points[i] = point;
+				}
+				fclose(fLog);
 
+				///////////////////////
+
+				sphere1->add(points);
+				for (int i = 0; i < sphere1->initial->Length; i++)
+					sphere1->transformed[i] = apply(sphere1->initial[i], M);
+
+				///////////////////////
+
+				gr->FillPolygon(br1, sphere1->transformed);
+
+			}
 			String^ fileName = "Sphere\\pic1.txt";
 			for (int i = 1; i < 9; i++) {
 				fileName = fileName->Substring(0, 10);
@@ -931,6 +981,89 @@ namespace Graphic {
 				///////////////////////
 
 				gr->DrawLines(pn_line, sphere1->transformed);
+			}
+		}
+
+		void drawInside4() {
+
+			/////////////////////////////////////
+
+			array<float, 2>^ M = castle->Tr->next();
+
+			/////////////////////////////////////
+
+			{
+				String^ fileName = "Inside1\\picf1.txt";
+				Brush^ br1 = gcnew SolidBrush(Color::DarkGray);
+				gr->FillRectangle(br1, 0, 0, pbPlot->Image->Width, pbPlot->Image->Height);
+				for (int i = 1; i < 11; i++) {
+					if (i == 1)
+						br1 = gcnew SolidBrush(Color::Gray);
+					if (i == 2)
+						br1 = gcnew SolidBrush(Color::Gray);
+					if (i == 3 || i == 4)
+						br1 = gcnew SolidBrush(Color::Black);
+					if (i == 5)
+						br1 = gcnew SolidBrush(Color::DarkOrange);
+					fileName = fileName->Substring(0, 12);
+					fileName += i + ".txt";
+					char* fName = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(fileName);
+					array<PointF>^ points = gcnew array<PointF>(getSize(fName));
+					if (points->Length < 2)
+						return;
+					PointF point;
+					FILE* fLog = fopen(fName, "r");
+					int x, y;
+					for (int i = 0; fscanf(fLog, "%d\t%d\n", &x, &y) != EOF; i++) {
+						point.X = x;
+						point.Y = y;
+						points[i] = point;
+					}
+					fclose(fLog);
+
+					///////////////////////
+
+					castle->add(points);
+					for (int i = 0; i < castle->initial->Length; i++)
+						castle->transformed[i] = apply(castle->initial[i], M);
+
+					///////////////////////
+
+					gr->FillPolygon(br1, castle->transformed);
+					
+				}
+			}
+
+
+			String^ fileName = "Inside1\\pic1.txt";
+			for (int i = 1; i < 30; i++) {
+				fileName = fileName->Substring(0, 11);
+				fileName += i + ".txt";
+				char* fName = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(fileName);
+				array<PointF>^ points = gcnew array<PointF>(getSize(fName));
+				if (points->Length < 2)
+					return;
+				PointF point;
+				FILE* fLog = fopen(fName, "r");
+				int x, y;
+				for (int i = 0; fscanf(fLog, "%d\t%d\n", &x, &y) != EOF; i++) {
+					point.X = x;
+					point.Y = y;
+					points[i] = point;
+				}
+				fclose(fLog);
+
+				///////////////////////
+
+				castle->add(points);
+				for (int i = 0; i < castle->initial->Length; i++)
+					castle->transformed[i] = apply(castle->initial[i], M);
+
+				///////////////////////
+
+				gr->DrawLines(pn_line, castle->transformed);
+				Brush^ br2 = gcnew SolidBrush(Color::DarkGray);
+				gr->FillRectangle(br2, Convert::ToDouble(apply(PointF(0, 245), M).X), Convert::ToDouble(apply(PointF(0, 245), M).Y), pbPlot->Image->Width, pbPlot->Image->Height);
 			}
 		}
 
@@ -989,7 +1122,7 @@ private: System::Void MyForm_KeyPress(System::Object^ sender, System::Windows::F
 		pbPlot->Refresh();
 	}
 	if (Convert::ToInt16(e->KeyChar) == Convert::ToInt16(System::Windows::Forms::Keys::S)) {
-		ticks += 50;
+		ticks = 900;
 	}
 }
 private: System::Void pbPlot_MouseClick(System::Object^ sender, System::Windows::Forms::MouseEventArgs^ e) {
@@ -1077,9 +1210,206 @@ private: System::Void timer1_Tick(System::Object^ sender, System::EventArgs^ e) 
 		gr->FillRectangle(br, 0, 0, pbPlot->Image->Width, pbPlot->Image->Height);
 		drawInside3();
 		drawHand();
-		int key = 1 + ticks % 2;
-		drawLightning(key);
+		if (ticks < 750) {
+			int key = 1 + ticks % 2;
+			drawLightning(key);
+		}
 		drawSphere1();
+		pbPlot->Refresh();
+	}
+	if (ticks == 800) {
+		sphere1->Update();
+		castle->Update();
+		knight1->Update();
+	}
+	if (ticks > 800 && ticks < 950) {
+		gr->FillRectangle(br, 0, 0, pbPlot->Image->Width, pbPlot->Image->Height);
+		drawInside4();
+		drawSkeleton3();
+		drawSphere1();
+		pbPlot->Refresh();
+	}
+	if (ticks == 950) {
+		sphere1->Update1();
+		castle->Update1();
+	}
+	if (ticks > 950 && ticks < 1025) {
+		gr->FillRectangle(br, 0, 0, pbPlot->Image->Width, pbPlot->Image->Height);
+		drawInside4();
+		drawSphere1();
+		pbPlot->Refresh();
+	}
+	if (ticks > 1025 && ticks < 1053) {
+		gr->FillRectangle(br, 0, 0, pbPlot->Image->Width, pbPlot->Image->Height);
+		drawInside4();
+		drawSphere1();
+		array<PointF>^ points = gcnew array<PointF>(2);
+		Pen^ pn = gcnew Pen(Color::LightBlue, 4);
+		Brush^ br1 = gcnew SolidBrush(Color::LightSkyBlue);
+		points[0] = PointF(338, 119);
+		points[1] = PointF(323,	129);
+		if (ticks > 1027) 
+		{
+			points = gcnew array<PointF>(3);
+			points[0] = PointF(338, 119);
+			points[1] = PointF(323, 129);
+			points[2] = PointF(341, 148);
+		}
+		if (ticks > 1029) 
+		{
+			points = gcnew array<PointF>(4);
+			points[0] = PointF(338, 119);
+			points[1] = PointF(323, 129);
+			points[2] = PointF(341, 148);
+			points[3] = PointF(308, 166);
+		}
+		if (ticks > 1031)
+		{
+			points = gcnew array<PointF>(5);
+			points[0] = PointF(338, 119);
+			points[1] = PointF(323, 129);
+			points[2] = PointF(341, 148);
+			points[3] = PointF(308, 166);
+			points[4] = PointF(333, 188);
+		}
+		if (ticks > 1033) 
+		{
+			points = gcnew array<PointF>(6);
+			points[0] = PointF(338, 119);
+			points[1] = PointF(323, 129);
+			points[2] = PointF(341, 148);
+			points[3] = PointF(308, 166);
+			points[4] = PointF(333, 188);
+			points[5] = PointF(303, 212);
+		}
+		if (ticks > 1035) 
+		{
+			points = gcnew array<PointF>(7);
+			points[0] = PointF(338, 119);
+			points[1] = PointF(323, 129);
+			points[2] = PointF(341, 148);
+			points[3] = PointF(308, 166);
+			points[4] = PointF(333, 188);
+			points[5] = PointF(303, 212);
+			points[6] = PointF(332, 224);
+		}
+		if (ticks > 1037) 
+		{
+			points = gcnew array<PointF>(8);
+			points[0] = PointF(338, 119);
+			points[1] = PointF(323, 129);
+			points[2] = PointF(341, 148);
+			points[3] = PointF(308, 166);
+			points[4] = PointF(333, 188);
+			points[5] = PointF(303, 212);
+			points[6] = PointF(332, 224);
+			points[7] = PointF(313, 248);
+		}
+		if (ticks > 1039) 
+		{	
+			points = gcnew array<PointF>(9);
+			points[0] = PointF(338, 119);
+			points[1] = PointF(323, 129);
+			points[2] = PointF(341, 148);
+			points[3] = PointF(308, 166);
+			points[4] = PointF(333, 188);
+			points[5] = PointF(303, 212);
+			points[6] = PointF(332, 224);
+			points[7] = PointF(313, 248);
+			points[8] = PointF(338, 260);
+		}
+		if (ticks > 1041) 
+		{
+			points = gcnew array<PointF>(10);
+			points[0] = PointF(338, 119);
+			points[1] = PointF(323, 129);
+			points[2] = PointF(341, 148);
+			points[3] = PointF(308, 166);
+			points[4] = PointF(333, 188);
+			points[5] = PointF(303, 212);
+			points[6] = PointF(332, 224);
+			points[7] = PointF(313, 248);
+			points[8] = PointF(338, 260);
+			points[9] = PointF(320, 281);
+		}
+		if (ticks > 1043) 
+		{
+			points = gcnew array<PointF>(11);
+			points[0] = PointF(338, 119);
+			points[1] = PointF(323, 129);
+			points[2] = PointF(341, 148);
+			points[3] = PointF(308, 166);
+			points[4] = PointF(333, 188);
+			points[5] = PointF(303, 212);
+			points[6] = PointF(332, 224);
+			points[7] = PointF(313, 248);
+			points[8] = PointF(338, 260);
+			points[9] = PointF(320, 281);
+			points[10] = PointF(342, 296);
+		}
+		if (ticks > 1045) {
+			points = gcnew array<PointF>(6);
+			points[0] = PointF(338, 119);
+			points[1] = PointF(323, 129);
+			points[2] = PointF(341, 148);
+			points[3] = PointF(0, 200);
+			points[4] = PointF(0, 0);
+			points[5] = PointF(200, 0);
+			gr->FillPolygon(br1, points);
+		}
+		if (ticks > 1047) {
+			points = gcnew array<PointF>(9);
+			points[0] = PointF(338, 119);
+			points[1] = PointF(323, 129);
+			points[2] = PointF(341, 148);
+			points[3] = PointF(308, 166);
+			points[4] = PointF(333, 188);
+			points[5] = PointF(303, 212);
+			points[6] = PointF(0, 270);
+			points[7] = PointF(0, 0);
+			points[8] = PointF(200, 0);
+			gr->FillPolygon(br1, points);
+		}
+		if (ticks > 1049) {
+			points = gcnew array<PointF>(11);
+			points[0] = PointF(338, 119);
+			points[1] = PointF(323, 129);
+			points[2] = PointF(341, 148);
+			points[3] = PointF(308, 166);
+			points[4] = PointF(333, 188);
+			points[5] = PointF(303, 212);
+			points[6] = PointF(332, 224);
+			points[7] = PointF(313, 248);
+			points[8] = PointF(0, 300);
+			points[9] = PointF(0, 0);
+			points[10] = PointF(200, 0);
+			gr->FillPolygon(br1, points);
+		}
+		if (ticks > 1051) {
+			points = gcnew array<PointF>(15);
+			points[0] = PointF(338, 119);
+			points[1] = PointF(323, 129);
+			points[2] = PointF(341, 148);
+			points[3] = PointF(308, 166);
+			points[4] = PointF(333, 188);
+			points[5] = PointF(303, 212);
+			points[6] = PointF(332, 224);
+			points[7] = PointF(313, 248);
+			points[8] = PointF(338, 260);
+			points[9] = PointF(320, 281);
+			points[10] = PointF(342, 296);
+			points[11] = PointF(100, pbPlot->Image->Height);
+			points[12] = PointF(0, pbPlot->Image->Height);
+			points[13] = PointF(0, 0);
+			points[14] = PointF(200, 0);
+			gr->FillPolygon(br1, points);
+		}
+		gr->DrawLines(pn, points);
+		pbPlot->Refresh();
+	}
+	if (ticks > 1055) {
+		Brush^ br1 = gcnew SolidBrush(Color::LightSkyBlue);
+		gr->FillRectangle(br1, 0, 0, pbPlot->Image->Width, pbPlot->Image->Height);
 		pbPlot->Refresh();
 	}
 }
