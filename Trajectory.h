@@ -124,7 +124,7 @@ public:
 	}
 protected:
 	void position(float t, array<float, 2>^ M)override {
-		scale_mat(kx * t, ky * t, M);
+		scale_mat(c, kx * t, ky * t, M);
 	}
 private:
 	PointF c;

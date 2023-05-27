@@ -35,10 +35,10 @@ void scale_mat(float kx, float ky, array<float, 2>^ S) {
 //функция поворота
 void rotate_mat(float phi, array<float, 2>^ R) {
 	identity_mat(R);
-	R[0, 0] = cos(phi);
-	R[1, 1] = R[0, 0];
-	R[0, 0] = sin(phi);
-	R[1, 0] = -R[0, 1];
+	R[0, 0] += cos(phi);
+	R[1, 1] += R[0, 0];
+	R[0, 0] += sin(phi);
+	R[1, 0] += -R[0, 1];
 }
 
 PointF apply(PointF p, array<float, 2>^ M) {//что она делает, зачем нужна?

@@ -47,9 +47,10 @@ public:
 
 	Sphere1() {
 		initial = gcnew array<PointF>(1);
-		initial[0] = PointF(0, 0);
-		Complex_Traj^ T = gcnew Complex_Traj(1);
-		T->add(gcnew Traj_Move(initial[0], -0.3, 0));
+		initial[0] = PointF(339, 209);
+		Complex_Traj^ T = gcnew Complex_Traj(2);
+		T->add(gcnew Traj_Scale(PointF(339, 209), 0.01, 0.01));
+		T->add(gcnew Traj_Rotate(PointF(339, 209), 0.1, 0));
 		Tr = T;
 	}
 

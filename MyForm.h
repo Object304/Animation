@@ -32,14 +32,13 @@ namespace Graphic {
 			pbPlot->Image = gcnew Bitmap(pbPlot->Width, pbPlot->Height);
 			br = gcnew SolidBrush(Color::White);
 			br_text = gcnew SolidBrush(Color::Black);
-			pn_axes = gcnew Pen(Color::Black, 3);
 			pn_line = gcnew Pen(Color::Black, 4);
-			pn_grid = gcnew Pen(Color::Gray, 1);
 			printFont = gcnew System::Drawing::Font("Arial", 8);
 			gr = Graphics::FromImage(pbPlot->Image);
 
 			knight1 = gcnew Knight1;
 			castle = gcnew Castle;
+			sphere1 = gcnew Sphere1;
 		}
 
 	protected:
@@ -110,7 +109,7 @@ namespace Graphic {
 #pragma endregion
 
 		Brush^ br, ^ br_text;
-		Pen^ pn_axes, ^ pn_line, ^ pn_grid;
+		Pen^ pn_line;
 		System::Drawing::Font^ printFont;
 		Graphics^ gr;
 		bool mouseClick = false;
@@ -120,6 +119,7 @@ namespace Graphic {
 		Knight1^ knight1;
 		Castle^ castle;
 		float radius = 0;
+		Sphere1^ sphere1;
 		
 
 		void WorkSpace() {
@@ -213,7 +213,7 @@ namespace Graphic {
 
 			//drawInside3();
 			//drawSkeleton1();
-			drawSkeleton2();
+			//drawSkeleton2();
 
 			//Scene 6
 
@@ -222,8 +222,8 @@ namespace Graphic {
 
 			//Scene 7
 
-			//drawInside3();
-			//drawSkeleton3();
+			drawInside3();
+			drawSkeleton3();
 
 			pbPlot->Refresh();
 		}
@@ -875,6 +875,65 @@ namespace Graphic {
 			}
 		}
 
+		void drawSphere1() {
+			array<float, 2>^ M = sphere1->Tr->next();
+			{
+				String^ fileName = "Sphere\\pic1.txt";
+				Brush^ br1 = gcnew SolidBrush(Color::Blue);
+				char* fName = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(fileName);
+				array<PointF>^ points = gcnew array<PointF>(getSize(fName));
+				PointF point;
+				FILE* fLog = fopen(fName, "r");
+				int x, y;
+				for (int i = 0; fscanf(fLog, "%d\t%d\n", &x, &y) != EOF; i++) {
+					point.X = x;
+					point.Y = y;
+					points[i] = point;
+				}
+				fclose(fLog);
+
+				///////////////////////
+
+				sphere1->add(points);
+				for (int i = 0; i < sphere1->initial->Length; i++)
+					sphere1->transformed[i] = apply(sphere1->initial[i], M);
+
+				///////////////////////
+
+				gr->FillPolygon(br1, sphere1->transformed);
+				
+			}
+
+			String^ fileName = "Sphere\\pic1.txt";
+			for (int i = 1; i < 9; i++) {
+				fileName = fileName->Substring(0, 10);
+				fileName += i + ".txt";
+				char* fName = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(fileName);
+				array<PointF>^ points = gcnew array<PointF>(getSize(fName));
+				if (points->Length < 2)
+					return;
+				PointF point;
+				FILE* fLog = fopen(fName, "r");
+				int x, y;
+				for (int i = 0; fscanf(fLog, "%d\t%d\n", &x, &y) != EOF; i++) {
+					point.X = x;
+					point.Y = y;
+					points[i] = point;
+				}
+				fclose(fLog);
+
+				///////////////////////
+
+				sphere1->add(points);
+				for (int i = 0; i < sphere1->initial->Length; i++)
+					sphere1->transformed[i] = apply(sphere1->initial[i], M);
+
+				///////////////////////
+
+				gr->DrawLines(pn_line, sphere1->transformed);
+			}
+		}
+
 private: System::Void MyForm_KeyPress(System::Object^ sender, System::Windows::Forms::KeyPressEventArgs^ e) {
 	if (Convert::ToInt16(e->KeyChar) == Convert::ToInt16(System::Windows::Forms::Keys::C))
 		Clear();
@@ -1006,15 +1065,21 @@ private: System::Void timer1_Tick(System::Object^ sender, System::EventArgs^ e) 
 		gr->FillEllipse(br1, 466 - radius, 241 - radius, 2 * radius, 2 * radius);
 		pbPlot->Refresh();
 	}
-	if (ticks > 675 && ticks < 725) {
+	if (ticks > 675 && ticks < 700) {
 		gr->FillRectangle(br, 0, 0, pbPlot->Image->Width, pbPlot->Image->Height);
 		drawInside3();
 		drawHand();
 		int key = 1 + ticks % 2;
 		drawLightning(key);
-
-
-
+		pbPlot->Refresh();
+	}
+	if (ticks > 700 && ticks < 800) {
+		gr->FillRectangle(br, 0, 0, pbPlot->Image->Width, pbPlot->Image->Height);
+		drawInside3();
+		drawHand();
+		int key = 1 + ticks % 2;
+		drawLightning(key);
+		drawSphere1();
 		pbPlot->Refresh();
 	}
 }
