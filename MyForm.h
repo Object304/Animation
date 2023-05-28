@@ -33,7 +33,7 @@ namespace Graphic {
 			br = gcnew SolidBrush(Color::White);
 			br_text = gcnew SolidBrush(Color::Black);
 			pn_line = gcnew Pen(Color::Black, 4);
-			printFont = gcnew System::Drawing::Font("Arial Bold Italic", 48);
+			printFont = gcnew System::Drawing::Font("Arial Bold Italic", 25);
 			gr = Graphics::FromImage(pbPlot->Image);
 
 			knight1 = gcnew Knight1;
@@ -116,7 +116,7 @@ namespace Graphic {
 		System::Drawing::Font^ printFont;
 		Graphics^ gr;
 		bool mouseClick = false;
-		const char* curName = "Data\\pic1.txt";
+		const char* curName = "Data\\picf1.txt";
 		int curNum = 1;
 		int ticks = 0;
 		Knight1^ knight1;
@@ -132,7 +132,7 @@ namespace Graphic {
 
 		void updateName() {
 			String^ str = gcnew String(curName);
-			str = str->Substring(0, 8);
+			str = str->Substring(0, 9);
 			curNum++;
 			curName = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(str + curNum + ".txt");
 		}
@@ -227,7 +227,8 @@ namespace Graphic {
 
 			//drawInside3();
 			//drawSkeleton3();
-			drawSphere1();
+			//drawSphere1();
+			drawFinale();
 
 
 			pbPlot->Refresh();
@@ -1067,6 +1068,64 @@ namespace Graphic {
 			}
 		}
 
+		void drawFinale() {
+
+			{
+				String^ fileName = "Finale\\picf1.txt";
+				Brush^ br1 = gcnew SolidBrush(Color::DarkOrange);
+				gr->FillRectangle(br1, 0, 0, pbPlot->Image->Width, pbPlot->Image->Height);
+				for (int i = 1; i < 6; i++) {
+					if (i == 1)
+						br1 = gcnew SolidBrush(Color::Orange);
+					if (i == 2)
+						br1 = gcnew SolidBrush(Color::OrangeRed);
+					if (i == 3)
+						br1 = gcnew SolidBrush(Color::PaleVioletRed);
+					if (i == 4)
+						br1 = gcnew SolidBrush(Color::Gray);
+					if (i == 5)
+						br1 = gcnew SolidBrush(Color::DarkGray);
+					fileName = fileName->Substring(0, 11);
+					fileName += i + ".txt";
+					char* fName = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(fileName);
+					array<PointF>^ points = gcnew array<PointF>(getSize(fName));
+					if (points->Length < 2)
+						return;
+					PointF point;
+					FILE* fLog = fopen(fName, "r");
+					int x, y;
+					for (int i = 0; fscanf(fLog, "%d\t%d\n", &x, &y) != EOF; i++) {
+						point.X = x;
+						point.Y = y;
+						points[i] = point;
+					}
+					fclose(fLog);
+					gr->FillPolygon(br1, points);
+				}
+			}
+
+
+			String^ fileName = "Finale\\pic1.txt";
+			for (int i = 1; i < 30; i++) {
+				fileName = fileName->Substring(0, 10);
+				fileName += i + ".txt";
+				char* fName = (char*)(void*)System::Runtime::InteropServices::Marshal::StringToHGlobalAnsi(fileName);
+				array<PointF>^ points = gcnew array<PointF>(getSize(fName));
+				if (points->Length < 2)
+					return;
+				PointF point;
+				FILE* fLog = fopen(fName, "r");
+				int x, y;
+				for (int i = 0; fscanf(fLog, "%d\t%d\n", &x, &y) != EOF; i++) {
+					point.X = x;
+					point.Y = y;
+					points[i] = point;
+				}
+				fclose(fLog);
+				gr->DrawLines(pn_line, points);
+			}
+		}
+
 private: System::Void MyForm_KeyPress(System::Object^ sender, System::Windows::Forms::KeyPressEventArgs^ e) {
 	if (Convert::ToInt16(e->KeyChar) == Convert::ToInt16(System::Windows::Forms::Keys::C))
 		Clear();
@@ -1412,12 +1471,20 @@ private: System::Void timer1_Tick(System::Object^ sender, System::EventArgs^ e) 
 		gr->FillRectangle(br1, 0, 0, pbPlot->Image->Width, pbPlot->Image->Height);
 		pbPlot->Refresh();
 	}
-	if (ticks > 1120 && ticks < 1150) {
+	if (ticks > 1120 && ticks < 1300) {
 		Brush^ br1 = gcnew SolidBrush(Color::LightSkyBlue);
-		Brush^ br2 = gcnew SolidBrush(Color::Black);
+		Brush^ br2 = gcnew SolidBrush(Color::BlanchedAlmond);
 		gr->FillRectangle(br1, 0, 0, pbPlot->Image->Width, pbPlot->Image->Height);
-		gr->DrawString("std::cout << \"The End\";", printFont, br2, PointF((pbPlot->Image->Width) / 2 - 340, (pbPlot->Image->Height) / 2 - 50));
-		gr->DrawString(")))", printFont, br2, PointF((pbPlot->Image->Width) / 2 - 50, (pbPlot->Image->Height) / 2));
+		gr->DrawString("std::cout << \"The End\";", printFont, br2, PointF((pbPlot->Image->Width) - 345, (pbPlot->Image->Height) - 80));
+		gr->DrawString(")))", printFont, br2, PointF((pbPlot->Image->Width) - 345, (pbPlot->Image->Height) - 50));
+		pbPlot->Refresh();
+	}
+	if (ticks > 1300 && ticks < 1400) {
+		drawFinale();
+		drawSkeleton1();
+		Brush^ br2 = gcnew SolidBrush(Color::BlanchedAlmond);
+		gr->DrawString("std::cout << \"The End\";", printFont, br2, PointF((pbPlot->Image->Width) - 345, (pbPlot->Image->Height) - 80));
+		gr->DrawString(")))", printFont, br2, PointF((pbPlot->Image->Width) - 345, (pbPlot->Image->Height) - 50));
 		pbPlot->Refresh();
 	}
 }
