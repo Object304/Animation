@@ -80,10 +80,9 @@ namespace Graphic {
 			// pbPlot
 			// 
 			this->pbPlot->BorderStyle = System::Windows::Forms::BorderStyle::FixedSingle;
-			this->pbPlot->Location = System::Drawing::Point(8, 8);
-			this->pbPlot->Margin = System::Windows::Forms::Padding(2);
+			this->pbPlot->Location = System::Drawing::Point(12, 12);
 			this->pbPlot->Name = L"pbPlot";
-			this->pbPlot->Size = System::Drawing::Size(667, 586);
+			this->pbPlot->Size = System::Drawing::Size(1000, 900);
 			this->pbPlot->TabIndex = 0;
 			this->pbPlot->TabStop = false;
 			this->pbPlot->MouseClick += gcnew System::Windows::Forms::MouseEventHandler(this, &MyForm::pbPlot_MouseClick);
@@ -95,12 +94,11 @@ namespace Graphic {
 			// 
 			// MyForm
 			// 
-			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
+			this->AutoScaleDimensions = System::Drawing::SizeF(9, 20);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
-			this->ClientSize = System::Drawing::Size(992, 620);
+			this->ClientSize = System::Drawing::Size(1488, 954);
 			this->Controls->Add(this->pbPlot);
 			this->KeyPreview = true;
-			this->Margin = System::Windows::Forms::Padding(2);
 			this->Name = L"MyForm";
 			this->Text = L"MyForm";
 			this->WindowState = System::Windows::Forms::FormWindowState::Maximized;
@@ -216,7 +214,7 @@ namespace Graphic {
 
 			//drawInside3();
 			//drawSkeleton1();
-			//drawSkeleton2();
+			drawSkeleton2();
 
 			//Scene 6
 
@@ -228,7 +226,7 @@ namespace Graphic {
 			//drawInside3();
 			//drawSkeleton3();
 			//drawSphere1();
-			drawFinale();
+			//drawFinale();
 
 
 			pbPlot->Refresh();
@@ -1192,7 +1190,8 @@ private: System::Void pbPlot_MouseClick(System::Object^ sender, System::Windows:
 }
 private: System::Void timer1_Tick(System::Object^ sender, System::EventArgs^ e) {
 	ticks++;
-	if (ticks < 325) {
+	if (ticks < 300) {
+		ticks++;
 		gr->FillRectangle(br, 0, 0, pbPlot->Image->Width, pbPlot->Image->Height);
 		drawSky();
 		drawCastle();
@@ -1206,6 +1205,7 @@ private: System::Void timer1_Tick(System::Object^ sender, System::EventArgs^ e) 
 		pbPlot->Refresh();
 	}
 	if (ticks > 425 && ticks < 475) {
+		ticks++;
 		gr->FillRectangle(br, 0, 0, pbPlot->Image->Width, pbPlot->Image->Height);
 		drawInside1();
 		drawInside2();
